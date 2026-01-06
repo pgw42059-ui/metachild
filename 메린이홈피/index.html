@@ -1,0 +1,841 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>메린이 (META Child)</title>
+  <meta name="description" content="메린이(META Child) — 메타트레이더(MT4/MT5) 기반 자동매매 시스템과 지수 선물 전략을 설계·구현하고 테스트합니다." />
+  <meta name="keywords" content="메타트레이더, MT4, MT5, 자동매매, 알고리즘 트레이딩, 지수선물, EA, Expert Advisor" />
+
+  <meta property="og:title" content="메린이 (META Child)" />
+  <meta property="og:description" content="메타트레이더(MT4/MT5) 기반 자동매매 시스템과 지수 선물 전략을 설계·구현하며 테스트와 개선을 반복합니다." />
+  <meta property="og:type" content="website" />
+
+  <style>
+    :root{
+      --bg: #0a1628;
+      --panel: rgba(255,255,255,0.08);
+      --panel2: rgba(255,255,255,0.12);
+      --panelSolid: rgba(15,30,60,0.85);
+      --text: rgba(255,255,255,0.92);
+      --muted: rgba(255,255,255,0.65);
+      --border: rgba(100,150,200,0.15);
+      --shadow: 0 20px 60px rgba(0,0,0,0.4);
+      --radius: 18px;
+      --accent: #60a5fa;
+      --accent-green: #34d399;
+      --accent-blue: #3b82f6;
+      --ring: 0 0 0 3px rgba(96,165,250,0.3);
+    }
+
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(30px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes slideIn {
+      from { opacity: 0; transform: translateX(-20px); }
+      to { opacity: 1; transform: translateX(0); }
+    }
+
+    @keyframes scaleIn {
+      from { opacity: 0; transform: scale(0.95); }
+      to { opacity: 1; transform: scale(1); }
+    }
+
+    *{ box-sizing: border-box; }
+    html { 
+      height: 100%; 
+      scroll-behavior: smooth;
+    }
+
+    body{
+      margin:0;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+    }
+
+    a{ color: inherit; text-decoration: none; }
+    a:hover{ text-decoration: underline; }
+
+    .wrap{
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 24px 18px 84px;
+    }
+
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0,0,0,0);
+      white-space: nowrap;
+      border: 0;
+    }
+
+    /* Top bar */
+    .topbar{
+      position: sticky;
+      top: 12px;
+      z-index: 10;
+      animation: slideIn 0.5s ease;
+    }
+
+    .topbar-main{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap: 12px;
+      padding: 10px 14px;
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      background: rgba(15,30,60,0.6);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+    }
+
+    .brand{
+      display:flex;
+      align-items:center;
+      gap: 10px;
+      min-width: 0;
+    }
+    .avatar{
+      width: 36px; height: 36px; border-radius: 12px;
+      background: linear-gradient(135deg, rgba(59,130,246,0.9), rgba(96,165,250,0.75));
+      box-shadow: var(--shadow);
+      border: 1px solid var(--border);
+      flex: 0 0 auto;
+    }
+    .brand .name{
+      font-weight: 750;
+      letter-spacing: -0.02em;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .brand .tag{
+      font-size: 12px;
+      color: var(--muted);
+      margin-left: 8px;
+      white-space: nowrap;
+    }
+
+    .actions{
+      display:flex;
+      align-items:center;
+      gap: 10px;
+      flex: 0 0 auto;
+    }
+
+    .btn{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      gap: 8px;
+      padding: 10px 14px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      background: var(--panel);
+      color: var(--text);
+      cursor: pointer;
+      font-weight: 650;
+      transition: transform .08s ease, background .2s ease, border-color .2s ease, filter .2s ease;
+      user-select: none;
+      text-decoration: none;
+      font-size: 14px;
+    }
+    .btn:hover{ background: var(--panel2); text-decoration:none; }
+    .btn:active{ transform: translateY(1px); }
+    .btn:focus{ outline: none; box-shadow: var(--ring); }
+
+    .btn.primary{
+      background: linear-gradient(135deg, rgba(59,130,246,0.9), rgba(96,165,250,0.7));
+      border-color: rgba(255,255,255,0.2);
+    }
+    .btn.primary:hover{ filter: brightness(1.08); }
+
+    .btn-large{
+      padding: 14px 28px;
+      font-size: 16px;
+      font-weight: 700;
+    }
+
+    /* Hero */
+    .hero{
+      margin-top: 18px;
+      padding: 48px 36px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      background: var(--panelSolid);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+      position: relative;
+      animation: fadeInUp 0.7s ease;
+      text-align: center;
+    }
+
+    .hero:before{
+      content:"";
+      position:absolute;
+      inset:-2px;
+      background:
+        radial-gradient(680px 240px at 50% 20%, rgba(59,130,246,0.12), transparent 62%),
+        radial-gradient(680px 240px at 50% 80%, rgba(96,165,250,0.08), transparent 62%);
+      pointer-events:none;
+    }
+
+    .hero-inner{ position: relative; max-width: 720px; margin: 0 auto; }
+
+    h1{
+      margin:0 0 14px;
+      font-size: clamp(36px, 5vw, 56px);
+      letter-spacing: -0.03em;
+      line-height: 1.06;
+    }
+    .subtitle{
+      margin:0 0 24px;
+      color: var(--muted);
+      font-size: 16px;
+      line-height: 1.65;
+      max-width: 640px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .cta{
+      display:flex;
+      gap: 12px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    /* Step Section */
+    .step-section{
+      margin-top: 60px;
+      animation: fadeInUp 0.7s ease backwards;
+    }
+
+    .step-header{
+      text-align: center;
+      margin-bottom: 32px;
+    }
+
+    .step-badge{
+      display: inline-block;
+      padding: 8px 16px;
+      border-radius: 999px;
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      margin-bottom: 12px;
+    }
+
+    .step-badge.step1{
+      background: rgba(59,130,246,0.15);
+      color: #60a5fa;
+      border: 1px solid rgba(59,130,246,0.3);
+    }
+
+    .step-badge.step2{
+      background: rgba(34,197,94,0.15);
+      color: #34d399;
+      border: 1px solid rgba(34,197,94,0.3);
+    }
+
+    .step-badge.step3{
+      background: rgba(251,146,60,0.15);
+      color: #fb923c;
+      border: 1px solid rgba(251,146,60,0.3);
+    }
+
+    .step-header h2{
+      margin: 0 0 10px;
+      font-size: clamp(28px, 4vw, 36px);
+      letter-spacing: -0.02em;
+      color: var(--text);
+    }
+
+    .step-header p{
+      margin: 0;
+      color: var(--muted);
+      font-size: 16px;
+      line-height: 1.6;
+      max-width: 600px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .step-content{
+      border: 1px solid rgba(100,150,200,0.2);
+      border-radius: var(--radius);
+      background: rgba(20,40,70,0.6);
+      box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+      padding: 24px;
+    }
+
+    /* Learn Cards */
+    .learn-card{
+      border: 1px solid rgba(100,150,200,0.2);
+      border-radius: 14px;
+      background: rgba(20,40,70,0.6);
+      overflow: hidden;
+      margin-bottom: 14px;
+    }
+    .learn-card:last-child{ margin-bottom: 0; }
+
+    .learn-card summary {
+      cursor: pointer;
+      list-style: none;
+      user-select: none;
+      transition: background 0.2s ease;
+      padding: 18px 20px;
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 12px;
+      color: rgba(255,255,255,0.95);
+    }
+    .learn-card summary::-webkit-details-marker { display: none; }
+    .learn-card summary:hover {
+      background: rgba(30,50,80,0.8);
+    }
+
+    .learn-card summary::after {
+      content: "▼";
+      font-size: 12px;
+      opacity: 0.7;
+      transition: transform 0.2s ease;
+      flex-shrink: 0;
+      margin-top: 4px;
+      color: rgba(255,255,255,0.7);
+    }
+    .learn-card[open] summary::after {
+      transform: rotate(180deg);
+    }
+
+    .card-title h3{
+      margin: 0 0 6px;
+      font-size: 17px;
+      letter-spacing: -0.01em;
+      color: rgba(255,255,255,0.98);
+      font-weight: 700;
+    }
+    .card-title p{
+      margin: 0;
+      font-size: 15px;
+      color: rgba(255,255,255,0.75);
+      line-height: 1.5;
+    }
+
+    .module-body{
+      padding: 0 20px 20px;
+      color: rgba(255,255,255,0.82);
+      font-size: 15px;
+      line-height: 1.8;
+      animation: fadeInUp 0.3s ease;
+      border-top: 1px solid rgba(100,150,200,0.15);
+      padding-top: 18px;
+      background: rgba(15,30,55,0.4);
+    }
+    .module-body ul{ margin: 10px 0 0 20px; padding:0; }
+    .module-body li{ margin: 10px 0; color: rgba(255,255,255,0.88); }
+    .module-body h4{ color: rgba(255,255,255,0.95); font-size: 16px; }
+    .module-body b{ color: rgba(255,255,255,0.98); font-weight: 700; }
+
+    .checklist{
+      margin-top: 12px;
+      border: 1px solid rgba(96,165,250,0.25);
+      border-radius: 12px;
+      padding: 16px;
+      background: rgba(30,50,80,0.5);
+      color: rgba(255,255,255,0.85);
+      font-size: 15px;
+      line-height: 1.8;
+    }
+    .checklist b{ color: rgba(255,255,255,0.98); font-weight: 700; }
+    .checklist ul{ margin: 10px 0 0 20px; padding:0; }
+    .checklist li{ margin: 9px 0; color: rgba(255,255,255,0.88); }
+
+    .kbd{
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+      font-size: 12px;
+      padding: 2px 6px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      background: rgba(255,255,255,0.06);
+      color: var(--text);
+      white-space: nowrap;
+    }
+    [data-theme="light"] .kbd{ background: rgba(0,0,0,0.04); }
+
+    .step-cta{
+      margin-top: 24px;
+      text-align: center;
+      padding-top: 24px;
+      border-top: 1px solid var(--border);
+    }
+
+    /* Indicator Section */
+    .indicator-grid{
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+
+    .indicator-card{
+      padding: 20px;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      background: rgba(255,255,255,0.04);
+      transition: all 0.2s ease;
+    }
+    [data-theme="light"] .indicator-card{ background: rgba(0,0,0,0.02); }
+    .indicator-card:hover{
+      background: rgba(255,255,255,0.08);
+      border-color: var(--accent-blue);
+      transform: translateY(-2px);
+    }
+    [data-theme="light"] .indicator-card:hover{ background: rgba(0,0,0,0.04); }
+
+    .indicator-card h4{
+      margin: 0 0 8px;
+      font-size: 15px;
+      letter-spacing: -0.01em;
+    }
+    .indicator-card p{
+      margin: 0;
+      font-size: 13px;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    /* Pricing Section */
+    .pricing-card{
+      max-width: 500px;
+      margin: 0 auto 24px;
+      padding: 32px 28px;
+      border: 2px solid var(--accent-green);
+      border-radius: var(--radius);
+      background: rgba(34,197,94,0.05);
+      text-align: center;
+    }
+
+    .price{
+      font-size: 48px;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      margin: 16px 0;
+      color: var(--accent-green);
+    }
+    .price-period{
+      font-size: 18px;
+      color: var(--muted);
+      font-weight: 600;
+    }
+
+    .feature-list{
+      text-align: left;
+      margin: 24px 0;
+    }
+    .feature-list li{
+      padding: 10px 0;
+      border-bottom: 1px solid var(--border);
+      font-size: 14px;
+    }
+    .feature-list li:last-child{ border-bottom: none; }
+    .feature-list li::before{
+      content: "✓";
+      color: var(--accent-green);
+      font-weight: bold;
+      margin-right: 10px;
+    }
+
+    /* Footer */
+    .footer-section{
+      margin-top: 80px;
+      padding-top: 40px;
+      border-top: 1px solid var(--border);
+    }
+
+    .footer-grid{
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 32px;
+      margin-bottom: 32px;
+    }
+
+    .footer-card{
+      padding: 24px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      background: var(--panelSolid);
+    }
+
+    .footer-card h3{
+      margin: 0 0 12px;
+      font-size: 16px;
+    }
+    .footer-card p{
+      margin: 0 0 16px;
+      font-size: 14px;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    .link-list{
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .link-item{
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      background: rgba(255,255,255,0.04);
+      transition: all 0.2s ease;
+      font-size: 14px;
+    }
+    [data-theme="light"] .link-item{ background: rgba(0,0,0,0.02); }
+    .link-item:hover{
+      background: rgba(255,255,255,0.08);
+      border-color: var(--accent);
+      text-decoration: none;
+    }
+    [data-theme="light"] .link-item:hover{ background: rgba(0,0,0,0.04); }
+
+    .copyright{
+      text-align: center;
+      color: var(--muted);
+      font-size: 13px;
+      padding: 20px 0;
+    }
+
+    /* Back to top */
+    .back-to-top{
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      background: var(--panelSolid);
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.3s ease, visibility 0.3s ease, transform 0.2s ease;
+      z-index: 9;
+      color: var(--text);
+      font-size: 20px;
+    }
+    .back-to-top.visible{
+      opacity: 1;
+      visibility: visible;
+    }
+    .back-to-top:hover{
+      transform: translateY(-3px);
+    }
+
+    @media (max-width: 860px){
+      .brand .tag{ display: none; }
+      h1{ font-size: 36px; }
+      .hero{ padding: 36px 24px; }
+      .step-section{ margin-top: 40px; }
+      .step-content{ padding: 20px; }
+    }
+
+    @media (max-width: 640px){
+      .cta{ flex-direction: column; width: 100%; }
+      .btn{ width: 100%; justify-content: center; }
+    }
+  </style>
+</head>
+
+<body data-theme="dark">
+  <div id="top"></div>
+
+  <div class="wrap">
+
+    <nav class="topbar" aria-label="Main navigation">
+      <div class="topbar-main">
+        <div class="brand">
+          <div class="avatar" aria-hidden="true"></div>
+          <div class="name">메린이 (META Child)</div>
+          <div class="tag">MetaTrader Algo Trading</div>
+        </div>
+
+        <div class="actions">
+          <a class="btn" href="https://t.me/metachild" target="_blank" rel="noopener noreferrer">📱 텔레그램</a>
+          <a class="btn" href="https://www.youtube.com/@메타어린이" target="_blank" rel="noopener noreferrer">🎥 유튜브</a>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero">
+      <div class="hero-inner">
+        <h1>메린이 <span style="font-weight:600; opacity:.78;">(META Child)</span></h1>
+        <p class="subtitle">
+          메타트레이더(MT4/MT5)를 "설정"이 아니라 "구조"로 이해하고,
+          틱 데이터부터 리스크 관리까지 실전에서 재현 가능한 자동매매 환경을 만듭니다.
+        </p>
+      </div>
+    </section>
+
+    <!-- Step 1: Learn -->
+    <section class="step-section" id="step1" style="animation-delay: 0.2s;">
+      <div class="step-header">
+        <div class="step-badge step1">Step 1 · 무료</div>
+        <h2>📚 MT5 완전 정복</h2>
+        <p>처음 설치부터 실전 세팅까지, 누구나 따라할 수 있는 단계별 가이드</p>
+      </div>
+
+      <div class="step-content">
+        
+        <details class="learn-card" open>
+          <summary>
+            <div class="card-title">
+              <h3>Level 0 · 시작 전 (필수)</h3>
+              <p>MT를 차트툴로 쓰다 망하는 지점을 먼저 정리합니다.</p>
+            </div>
+          </summary>
+          <div class="module-body">
+            <h4 style="margin:0 0 12px; font-size:15px; color:var(--text);">🚨 핵심 개념</h4>
+            <ul>
+              <li><b>MT5는 "차트툴"이 아닙니다.</b> 차트 + 주문 + 자동화 실행 환경이 통합된 플랫폼입니다.</li>
+              <li><b>Demo ≠ Real:</b> Demo 계정에서 되던 게 Real에서 안 되는 경우가 많습니다 (슬리피지, 체결 속도 차이).</li>
+              <li><b>Hedge vs Netting:</b> 계정 타입에 따라 포지션 관리 방식이 완전히 다릅니다.</li>
+              <li><b>수익보다 먼저:</b> 실행 안정성(세팅/체결/리스크)을 먼저 잡아야 합니다.</li>
+            </ul>
+
+            <h4 style="margin:20px 0 12px; font-size:15px; color:var(--text);">⚠️ 초보가 자주 하는 실수</h4>
+            <div class="checklist">
+              <b>1. 차트 난립</b>
+              <ul>
+                <li>처음부터 차트 10개 이상 띄우기 → 혼란만 가중</li>
+                <li>해결: 차트 1~2개로 시작, 필요할 때만 추가</li>
+              </ul>
+              <b style="display:block; margin-top:10px;">2. 옵션 오해</b>
+              <ul>
+                <li>"이 옵션이 뭐지?" 하고 막 체크 → 나중에 복구 불가능</li>
+                <li>해결: 모르는 옵션은 건드리지 않기, 템플릿 백업</li>
+              </ul>
+              <b style="display:block; margin-top:10px;">3. 비밀번호 분실</b>
+              <ul>
+                <li>MT5가 자동으로 만든 복잡한 비밀번호를 기록 안 함</li>
+                <li>해결: <b>반드시 메모장에 적어두기</b> (다음 섹션 참고)</li>
+              </ul>
+            </div>
+          </div>
+        </details>
+
+        <details class="learn-card">
+          <summary>
+            <div class="card-title">
+              <h3>Level 1 · MT5 설치 & Demo 계정 로그인 ⭐</h3>
+              <p>처음 설치한 MT5에서 Demo 계정으로 안전하게 연습 환경을 만듭니다.</p>
+            </div>
+          </summary>
+          <div class="module-body">
+            <p style="margin:0 0 16px;">
+              <b>아래 스크린샷과 함께 단계별로 따라오세요.</b> 실제 돈이 들어가지 않는 Demo 계정부터 시작합니다.
+            </p>
+
+            <div class="checklist">
+              <b>Step 1: 계정 추가하기</b>
+              <ul>
+                <li>MT5 실행 후 좌측 <span class="kbd">네비게이터</span> 창 확인</li>
+                <li><span class="kbd">계정</span> 항목에서 마우스 우클릭</li>
+                <li>메뉴에서 <span class="kbd">거래 계좌 로그인</span> 선택</li>
+              </ul>
+
+              <b style="display:block; margin-top:16px;">Step 2: 브로커 서버 찾기</b>
+              <ul>
+                <li>상단 검색창에 브로커 이름 입력 (예: "EZSquare", "company.com")</li>
+                <li>목록에서 정확히 일치하는 서버 선택 (예: EZSquare-Server)</li>
+                <li><span class="kbd">다음</span> 버튼 클릭</li>
+              </ul>
+
+              <b style="display:block; margin-top:16px;">Step 3: 계정 타입 선택 (중요!)</b>
+              <ul>
+                <li><b>⭐ "데모로 가입 (무료)" 옵션 선택</b> - 실제 돈 없이 연습 가능</li>
+                <li>"실거래 위한 실제 계좌"는 나중에 (실전 전환 시)</li>
+                <li>Demo를 충분히 연습한 후 Real로 전환하는 게 안전</li>
+              </ul>
+
+              <b style="display:block; margin-top:16px;">Step 4: 계정 정보 입력</b>
+              <ul>
+                <li><b>이름:</b> 본인 식별용 (예: "홍길동_연습용")</li>
+                <li><b>계정 종류:</b> "Demo" 확인 (자동 선택됨)</li>
+                <li><b>초기자본금:</b> 100000 USD 권장 (충분한 연습 자금)</li>
+                <li><b>레버리지:</b> 1:100 기본값 유지</li>
+                <li>"가입 절차 동의" 체크박스 확인 후 <span class="kbd">다음</span></li>
+              </ul>
+
+              <b style="display:block; margin-top:16px;">Step 5: 🚨 비밀번호 저장 (필수!)</b>
+              <ul>
+                <li>MT5가 자동으로 생성한 <b>로그인 ID와 비밀번호</b>가 표시됨</li>
+                <li>예: 로그인 ID: 2100129680, 비밀번호: jkdUow</li>
+                <li><b>반드시 이 정보를 메모장/휴대폰 메모에 복사!</b></li>
+                <li>화면 스크린샷 찍기 (Windows: Win+Shift+S)</li>
+                <li>이 정보 없으면 계정 복구 불가능!</li>
+              </ul>
+
+              <b style="display:block; margin-top:16px;">Step 6: 로그인 완료 확인</b>
+              <ul>
+                <li>네비게이터 창 → 계정 목록에서 본인 계정 확인</li>
+                <li>계정 우클릭 시 "비밀번호 변경", "삭제" 등 메뉴 표시</li>
+                <li>우측 상단에 계정 잔고(예: $100,000.00) 표시 확인</li>
+                <li>하단 "거래" 탭에서 "잔고: 100000.00 USD" 확인</li>
+              </ul>
+            </div>
+
+            <div class="note" style="margin-top:16px;">
+              <b style="color: var(--text);">✅ Level 1 완료 체크리스트</b><br/>
+              □ Demo 계정 로그인 성공<br/>
+              □ 로그인 ID와 비밀번호를 안전한 곳에 저장<br/>
+              □ 네비게이터에서 계정 이름 확인<br/>
+              □ 계정 잔고 $100,000 표시 확인<br/>
+              □ 차트 1개만 띄운 상태로 시작<br/><br/>
+              <b style="color: var(--text);">💡 영상 가이드 (준비 예정)</b><br/>
+              나중에 이 자리에 유튜브 영상을 추가할 예정입니다.<br/>
+              영상으로 보면 훨씬 쉽게 따라할 수 있습니다!
+            </div>
+          </div>
+        </details>
+
+        <details class="learn-card">
+          <summary>
+            <div class="card-title">
+              <h3>Level 2 · 계정 타입과 차트 기본 세팅</h3>
+              <p>Hedge vs Netting 이해하고, 차트를 실전용으로 설정합니다.</p>
+            </div>
+          </summary>
+          <div class="module-body">
+            <h4 style="margin:0 0 12px; font-size:15px; color:var(--text);">🎯 계정 타입 이해 (매우 중요!)</h4>
+            
+            <div class="checklist">
+              <b>Hedge (헷지) 계정</b>
+              <ul>
+                <li>같은 심볼에 <b>Buy와 Sell 동시 보유 가능</b></li>
+                <li>예: USDJPY Buy 1랏 + USDJPY Sell 1랏 = 2개 포지션</li>
+                <li>국내 대부분 브로커 (EZSquare 포함)</li>
+                <li>초보자에게 더 직관적</li>
+              </ul>
+
+              <b style="display:block; margin-top:12px;">Netting (네팅) 계정</b>
+              <ul>
+                <li>같은 심볼에 <b>한 방향만 보유 가능</b></li>
+                <li>예: Buy 1랏 상태에서 Sell 주문 시 → Buy가 청산됨</li>
+                <li>해외 일부 브로커</li>
+                <li>고급 사용자용 (EA 설계 복잡)</li>
+              </ul>
+            </div>
+
+            <div class="note" style="margin-top:14px;">
+              <b style="color: var(--text);">💡 어떻게 확인하나요?</b><br/>
+              계정 우클릭 → 명세서 → 계정 정보에 "Hedging" 또는 "Netting" 표시<br/>
+              대부분 Demo는 Hedge이니 걱정 안 해도 됩니다.
+            </div>
+
+            <h4 style="margin:24px 0 12px; font-size:15px; color:var(--text);">🎨 차트 기본 세팅</h4>
+
+            <div class="checklist">
+              <b>1) 시간봉 설정</b>
+              <ul>
+                <li>상단 툴바에서 <span class="kbd">M5</span>, <span class="kbd">M15</span>, <span class="kbd">H1</span> 버튼 사용</li>
+                <li>처음엔 3개 이하만 사용 (차트 난립 방지)</li>
+                <li>본인이 자주 보는 시간봉만 유지</li>
+              </ul>
+
+              <b style="display:block; margin-top:12px;">2) 불필요한 요소 제거</b>
+              <ul>
+                <li>차트 우클릭 → <span class="kbd">속성 (F8)</span></li>
+                <li>"그리드 보이기" 체크 해제 (깔끔해짐)</li>
+                <li>"OHLC 보이기" 필요 시만 체크</li>
+              </ul>
+
+              <b style="display:block; margin-top:12px;">3) 색상 통일</b>
+              <ul>
+                <li>차트 우클릭 → 속성 → "색상" 탭</li>
+                <li>배경/캔들/선 색상을 통일된 테마로 설정</li>
+                <li>다크 모드 or 라이트 모드 하나로 고정</li>
+              </ul>
+
+              <b style="display:block; margin-top:12px;">4) 템플릿 저장 (핵심!)</b>
+              <ul>
+                <li>차트 우클릭 → <span class="kbd">템플릿 → 저장</span></li>
+                <li>이름: <span class="kbd">Base_Template</span> (또는 본인 스타일 이름)</li>
+                <li>새 차트 열 때마다 이 템플릿 적용하면 통일성 유지</li>
+              </ul>
+            </div>
+
+            <div class="note" style="margin-top:16px;">
+              <b style="color: var(--text);">✅ Level 2 완료 체크리스트</b><br/>
+              □ 계정 타입(Hedge/Netting) 확인<br/>
+              □ 시간봉 3개 이하로 제한<br/>
+              □ 차트 색상/옵션 정리<br/>
+              □ 기본 템플릿 저장 완료<br/><br/>
+              <b>다음:</b> Level 3에서 보조지표 설치 및 적용을 배웁니다.
+            </div>
+          </div>
+        </details>
+
+        <details class="learn-card">
+          <summary>
+            <div class="card-title">
+              <h3>Level 3 · 지표(Indicator)</h3>
+              <p>지표를 "예측"이 아니라 "조건/구조"로 씁니다.</p>
+            </div>
+          </summary>
+          <div class="module-body">
+            <ul>
+              <li>보조지표의 역할(후행/필터/조건화)</li>
+              <li>실전에서 의미 있는 지표 구성</li>
+              <li>지표 설치/적용/템플릿 저장 흐름</li>
+            </ul>
+          </div>
+        </details>
+
+        <details class="learn-card">
+          <summary>
+            <div class="card-title">
+              <h3>Level 4 · EA 구조</h3>
+              <p>EA는 "자동 버튼"이 아니라 "규칙 엔진"입니다.</p>
+            </div>
+          </summary>
+          <div class="module-body">
+            <ul>
+              <li>진입 로직 / 리스크 / 청산 로직의 분리</li>
+              <li>백테스트 vs 실전(틱/스프레드/체결)의 차이</li>
+              <li>안정성(에러/예외처리)이 성능만큼 중요</li>
+            </ul>
+          </div>
+        </details>
+
+        <details class="learn-card">
+          <summary>
+            <div class="card-title">
+              <h3>Level 5 · 시스템 트레이딩 사고</h3>
+              <p>감각이 아니라 "평가 가능한 구조"로 접근합니다.</p>
+            </div>
+          </summary>
+          <div class="module-body">
+            <ul>
+              <li>승률보다 중요한 것(리스크-리워드, 손실 제한)</li>
+              <li>시스템을 평가하는 체크리스트
